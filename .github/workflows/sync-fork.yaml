@@ -1,0 +1,39 @@
+name: Sync Fork with Upstream
+
+on:
+  push:
+    branches:
+      - main
+      - feat/*
+      - fix/*
+
+jobs:
+  sync-fork:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Forked Repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.USERNAME }}/Bingoals
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Add Upstream Remote
+        run: |
+          git remote add upstream https://github.com/${{ github.repository }}.git
+          git remote -v
+
+      - name: Fetch Upstream Changes
+        run: |
+          git fetch upstream
+          git checkout ${{ github.ref_name }} || git checkout -b ${{ github.ref_name }}
+
+      - name: Force Merge Upstream Changes
+        run: |
+          # Dynamically merge the corresponding upstream branch
+          git merge upstream/${{ github.ref_name }} --allow-unrelated-histories --strategy-option=theirs --no-edit
+
+      - name: Push Changes to Fork
+        run: |
+          echo "Pushing changes to forked repository..."
+          git push origin ${{ github.ref_name }} --force

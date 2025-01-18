@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "ES2024",
+        "module": "commonjs",
+        "strict": true,
+        "esModuleInterop": true,
+        "outDir": "./dist",
+        "rootDir": "./app",
+        "forceConsistentCasingInFileNames": true,
+        "typeRoots": [
+            "./node_modules/@types",
+            "./app/types"
+        ],
+    },
+    "include": ["app/**/*.ts"],
+    "exclude": ["node_modules", "dist"]
+}
