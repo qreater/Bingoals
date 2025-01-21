@@ -6,7 +6,7 @@
  *
  *************************/
 
-import { Status, BaseResponse } from '../../interfaces/common'
+import { Status, FailureResponse } from '../interfaces/common'
 
 export enum ErrorType {
     CONFLICT = 'conflict_error',
@@ -20,8 +20,8 @@ export const createErrorResponse = (
     errorType: ErrorType,
     detail: string,
     statusCode: Status = Status.FAILURE,
-    additionalInfo?: any,
-): BaseResponse<any> => ({
+    additionalInfo?: string,
+): FailureResponse => ({
     status: statusCode,
     errors: {
         type: errorType,
@@ -33,13 +33,13 @@ export const createErrorResponse = (
 export class APIError extends Error {
     public statusCode: number
     public errorType: ErrorType
-    public additionalInfo?: any
+    public additionalInfo?: string
 
     constructor(
         errorType: ErrorType,
         message: string,
         statusCode: number,
-        additionalInfo?: any,
+        additionalInfo?: string,
     ) {
         super(message)
         this.statusCode = statusCode

@@ -18,7 +18,11 @@ import {
     UpdateResponse,
     DeleteResponse,
     ListResponse,
-} from '../../interfaces/common'
+    ErrorData,
+    SuccessResponse,
+    FailureResponse,
+} from '../interfaces/common'
+import { ErrorType } from './error'
 
 export const createMetaData = (
     page: number,
@@ -30,15 +34,31 @@ export const createMetaData = (
     total,
 })
 
-export const createBaseResponse = <T>(
+export const createBaseResponse = (
     status: Status,
-    data?: T,
     message?: string,
-    errors?: any,
-): BaseResponse<T> => ({
+): BaseResponse => ({
+    status,
+    message,
+})
+
+export const createSuccessResponse = <T>(
+    status: Status,
+    data: T,
+    message?: string,
+): SuccessResponse<T> => ({
     status,
     message,
     data,
+})
+
+export const createFailureResponse = (
+    status: Status,
+    errors: ErrorData,
+    message?: string,
+): FailureResponse => ({
+    status,
+    message,
     errors,
 })
 
@@ -102,11 +122,11 @@ export const responseHandler = <T>(
     kwargs: {
         data?: T
         message?: string
-        errors?: any
+        errors?: ErrorData
         meta?: MetaData
     },
 ) => {
-    const { data, message, errors, meta = defaultMeta } = kwargs
+    const { message, meta = defaultMeta } = kwargs
 
     const requestMethod = req.method as keyof typeof responseMapper
     const successStatusCodes: { [key: string]: number } = {
@@ -118,7 +138,7 @@ export const responseHandler = <T>(
 
     const responseMapper: Record<
         string,
-        (args: typeof kwargs) => BaseResponse<T> | ListResponse<T>
+        (args: typeof kwargs) => BaseResponse | ListResponse<T>
     > = {
         GET: ({ data }) =>
             Array.isArray(data)
@@ -137,9 +157,14 @@ export const responseHandler = <T>(
 
     const response =
         responseMapper[requestMethod]?.(kwargs) ||
-        createBaseResponse(Status.FAILURE, undefined, 'Unsupported method', {
-            method: requestMethod,
-        })
+        createFailureResponse(
+            Status.FAILURE,
+            {
+                type: ErrorType.VALIDATION,
+                message: 'Unsupported method',
+            },
+            'Unsupported method',
+        )
 
     const statusCode = successStatusCodes[requestMethod] ?? 400
 

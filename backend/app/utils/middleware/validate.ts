@@ -7,13 +7,25 @@
  *************************/
 
 import { Request, Response, NextFunction } from 'express'
+import { validationResult, ValidationChain } from 'express-validator'
+import { APIError } from '../responses/error'
 
-export const validateSchema = (schema: any) => {
-    return (req: Request, res: Response, next: NextFunction) => {
-        const { error } = schema.validate(req.body)
-        if (error) {
-            return res.status(422).json({ message: error.details[0].message })
+const validate = (validationSchema: ValidationChain[]) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
+        await Promise.all(
+            validationSchema.map((validation) => validation.run(req)),
+        )
+
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            const error = errors
+                .array()
+                .map((err) => err.msg)
+                .join(', ')
+            throw APIError.validation('Payload', error)
         }
         next()
     }
 }
+
+export default validate

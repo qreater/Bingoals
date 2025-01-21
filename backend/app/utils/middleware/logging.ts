@@ -9,6 +9,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import { logger } from '../tools/logger'
+import { AdvancedRequest } from '../interfaces/common'
 
 export const loggingMiddleware = (
     req: Request,
@@ -17,7 +18,7 @@ export const loggingMiddleware = (
 ) => {
     const requestId = uuidv4()
 
-    ;(req as any).requestId = requestId
+    ;(req as unknown as AdvancedRequest).requestId = requestId
 
     res.setHeader('X-Request-ID', requestId)
     res.setHeader('X-Correlation-ID', requestId)

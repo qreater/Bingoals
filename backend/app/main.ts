@@ -6,6 +6,7 @@
  *
  *************************/
 
+import 'express-async-errors'
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -25,7 +26,7 @@ const MONGODB_URI = process.env.MONGODB_URI || ''
 applyMiddlewares(app)
 
 app.get('/', (req: Request, res: Response) => {
-    responseHandler(req, res, {
+    responseHandler<null>(req, res, {
         message: 'Welcome to Bingoals API!',
     })
 })

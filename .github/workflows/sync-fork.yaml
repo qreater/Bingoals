@@ -1,5 +1,10 @@
 name: Sync Fork with Upstream
 
+permissions:
+  contents: write
+  pull-requests: none
+  issues: none
+
 on:
   push:
     branches:
@@ -35,5 +40,8 @@ jobs:
 
       - name: Push Changes to Fork
         run: |
-          echo "Pushing changes to forked repository..."
-          git push origin ${{ github.ref_name }} --force
+          if ! git push origin ${{ github.ref_name }} --force; then
+            echo "::error::Failed to push changes to fork"
+            exit 1
+          fi
+          echo "::notice::Successfully synced fork with upstream"

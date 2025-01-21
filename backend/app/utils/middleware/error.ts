@@ -9,12 +9,13 @@
 import { Request, Response, NextFunction } from 'express'
 import { logger } from '../tools/logger'
 import { APIError } from '../responses/error'
+import { AdvancedRequest } from '../interfaces/common'
 
 export const errorHandlingMiddleware = (
-    err: any,
+    err: Error | APIError,
     req: Request,
     res: Response,
-    next: NextFunction,
+    _next: NextFunction,
 ) => {
     if (err instanceof APIError) {
         res.status(err.statusCode).json({
@@ -38,10 +39,8 @@ export const errorHandlingMiddleware = (
 
         logger.error({
             alert: 'An unexpected error occurred',
-            request_id: (req as any).requestId,
+            request_id: (req as unknown as AdvancedRequest).requestId,
             error: err.stack?.split('\n').slice(0, 3).join('\n'),
         })
     }
-
-    next()
 }

@@ -7,11 +7,23 @@
  *************************/
 
 import headerPlugin from 'eslint-plugin-header'
+
 import tsParser from '@typescript-eslint/parser'
+import tseslint from 'typescript-eslint'
 
 headerPlugin.rules.header.meta.schema = false
 
-export default [
+export default tseslint.config(
+    {
+        ignores: [
+            '**/dev/**',
+            '**/dist/**',
+            '**/node_modules/**',
+            'tsconfig.json',
+        ],
+    },
+    ...tseslint.configs.recommended,
+    ...tseslint.configs.strict,
     {
         files: ['**/*.{ts,js}'],
         languageOptions: {
@@ -39,6 +51,13 @@ export default [
                 ],
                 2,
             ],
+            '@typescript-eslint/no-unused-vars': [
+                'error',
+                {
+                    argsIgnorePattern: '^_',
+                    varsIgnorePattern: '^_',
+                },
+            ],
         },
     },
-]
+)

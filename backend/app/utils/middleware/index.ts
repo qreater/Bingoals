@@ -6,12 +6,12 @@
  *
  *************************/
 
-import express from 'express'
+import express, { Application } from 'express'
 
 import { corsMiddleware } from './cors'
 import { loggingMiddleware } from './logging'
 
-export const applyMiddlewares = (app: any) => {
+export const applyMiddlewares = (app: Application) => {
     app.use(express.json())
     app.use(express.urlencoded({ extended: true }))
     app.use(corsMiddleware)
