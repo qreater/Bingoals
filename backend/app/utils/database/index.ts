@@ -5,3 +5,11 @@
  * See: http://www.apache.org/licenses/LICENSE-2.0
  *
  *************************/
+
+import { connectMongoDB } from './mongo'
+import { connectRedis } from './redis'
+
+export const makeDBConnections = async () => {
+    await connectMongoDB()
+    await connectRedis()
+}
