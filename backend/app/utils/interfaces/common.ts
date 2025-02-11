@@ -6,6 +6,9 @@
  *
  *************************/
 
+import { Request } from 'express'
+
+import { IUserDocument } from '../../models/user'
 import { ErrorType } from '../responses/error'
 
 export enum Status {
@@ -32,6 +35,10 @@ export interface ErrorData {
 
 export interface AdvancedRequest extends Request {
     requestId: string
+}
+
+export interface AuthRequest extends Request {
+    user?: IUserDocument
 }
 
 export interface BaseResponse {
