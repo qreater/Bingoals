@@ -7,14 +7,17 @@
  *************************/
 
 import jwt from 'jsonwebtoken'
+import { Job, Queue, Worker } from 'bullmq'
+
 import { createQueue, createWorker, redis } from '../database/redis'
+import { createEntity, readEntity } from '../database/mongo'
 
 import { IUserDocument, User } from '../../models/user'
-import { createEntity, readEntity } from '../database/mongo'
 import { APIError } from '../responses/error'
-import { config } from '../settings/config'
 import { sendMail } from '../mailer'
-import { Job, Queue, Worker } from 'bullmq'
+
+import { config } from '../settings/config'
+import { logger } from '../tools/logger'
 
 /**
  * CORE Utility Functions
@@ -28,7 +31,7 @@ export const generateOTP = () => {
 }
 
 export const storeOTP = async (email: string, otp: string) => {
-    await redis.setex(`otp:${email}:${otp}`, config.redisOtpExp, otp)
+    await redis.setex(`bgls:otp:${email}:${otp}`, config.redisOtpExp, otp)
 }
 
 export const sendOTP = async (
@@ -46,8 +49,15 @@ export const sendOTP = async (
 }
 
 export const verifyOTP = async (email: string, otp: string) => {
-    const storedOTP = await redis.get(`otp:${email}:${otp}`)
-    return storedOTP === otp.toString()
+    const key = `bgls:otp:${email}:${otp}`
+    const storedOtp = await redis.get(key)
+
+    if (storedOtp === otp.toString()) {
+        await redis.del(key)
+        return true
+    }
+
+    return false
 }
 
 export const generateToken = async (email: string) => {
@@ -76,16 +86,16 @@ let otpWorker: Worker
 
 export const getOTPQueue = async () => {
     if (!otpQueue) {
-        otpQueue = await createQueue('otpQueue')
-        console.log('OTP Queue Started')
+        otpQueue = await createQueue('bglsOtpQueue')
+        logger.info('[RS-INFO] OTP Queue Started')
     }
     return otpQueue
 }
 
 export const getOTPWorker = async () => {
     if (!otpWorker) {
-        otpWorker = await createWorker('otpQueue', processOTPJob)
-        console.log('OTP Worker Started')
+        otpWorker = await createWorker('bglsOtpQueue', processOTPJob)
+        logger.info('[RS-INFO] OTP Worker Started')
     }
     return otpWorker
 }

@@ -35,10 +35,20 @@ export const connectRedis = async () => {
 }
 
 export const getRedis = async (): Promise<Redis> => {
-    while (!redis) {
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-    }
-    return redis
+    if (redis) return redis
+    return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+            reject(new Error('Redis connection timeout'))
+        }, 30000)
+
+        const checkConnection = setInterval(() => {
+            if (redis) {
+                clearTimeout(timeout)
+                clearInterval(checkConnection)
+                resolve(redis)
+            }
+        }, 100)
+    })
 }
 
 export const createQueue = async (
@@ -48,6 +58,13 @@ export const createQueue = async (
     await getRedis()
     return new Queue(queueName, {
         connection: redis,
+        defaultJobOptions: {
+            attempts: 3,
+            backoff: {
+                type: 'exponential',
+                delay: 1000,
+            },
+        },
         ...options,
     })
 }
@@ -69,6 +86,19 @@ export const createWorker = async (
 
     worker.on('failed', (job, err: Error) => {
         logger.error(`[RS-WORKER]: Job ${job?.id} in ${queueName} failed:`, err)
+        if (job && job.attemptsMade < (job.opts.attempts || 3)) {
+            logger.warn(
+                `[RS-WORKER]: Job ${job.id} in ${queueName} failed, retrying in ${typeof job.opts.backoff === 'number' ? job.opts.backoff : job.opts.backoff?.delay || 1000}ms`,
+                err,
+            )
+        } else if (job) {
+            logger.error(
+                `[RS-WORKER]: Job ${job.id} in ${queueName} permanently failed after ${job.attemptsMade} attempts`,
+                err,
+            )
+        } else {
+            logger.error(`[RS-WORKER]: Job in ${queueName} failed`, err)
+        }
     })
 
     return worker

@@ -9,6 +9,8 @@
 import nodemailer from 'nodemailer'
 import hbs from 'nodemailer-express-handlebars'
 import path from 'path'
+
+import { logger } from '../tools/logger'
 import { config } from '../settings/config'
 
 const transporter = nodemailer.createTransport({
@@ -49,7 +51,12 @@ export const sendMail = async (
     try {
         await transporter.sendMail(mailOptions)
     } catch (error) {
-        console.error('Error sending email:', error)
+        logger.error('Failed to send email', {
+            error,
+            to,
+            subject,
+            template,
+        })
         throw error
     }
 }

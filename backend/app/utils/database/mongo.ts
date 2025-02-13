@@ -17,7 +17,7 @@ export const connectMongoDB = async (): Promise<void> => {
         logger.info('Established MongoDB Connection')
     } catch (error) {
         logger.error('MongoDB Connection Aborted:', error)
-        process.exit(1)
+        throw error
     }
 }
 

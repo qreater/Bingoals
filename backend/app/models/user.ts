@@ -47,11 +47,23 @@ export const userSchema = new Schema<IUserDocument>(
             type: String,
             required: [true, 'Username is required'],
             unique: true,
+            match: [
+                /^[a-zA-Z0-9_-]+$/,
+                'Username can only contain letters, numbers, underscores, and hyphens',
+            ],
+            trim: true,
+            lowercase: true,
         },
         email: {
             type: String,
             required: [true, 'Email is required'],
             unique: true,
+            match: [
+                /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                'Please enter a valid email address',
+            ],
+            trim: true,
+            lowercase: true,
         },
     },
     schemaOptions,

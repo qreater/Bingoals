@@ -64,7 +64,7 @@ export const lookup = async (request: Request, response: Response) => {
     await lookupCore(username, email)
 
     return responseHandler(request, response, {
-        message: 'User Can Be Registered!',
+        message: 'Lookup completed successfully',
     })
 }
 
