@@ -12,6 +12,7 @@ import { corsMiddleware } from './cors'
 import { loggingMiddleware } from './logging'
 
 export const applyMiddlewares = (app: Application) => {
+    app.set('trust proxy', 1)
     app.use(express.json())
     app.use(express.urlencoded({ extended: true }))
     app.use(corsMiddleware)

@@ -7,21 +7,19 @@
  *************************/
 
 import 'express-async-errors'
-import dotenv from 'dotenv'
-dotenv.config()
 
 import express, { Request, Response } from 'express'
-import mongoose from 'mongoose'
+
+import { config } from './utils/settings/config'
+import { logger } from './utils/tools/logger'
+import { makeDBConnections } from './utils/database'
+import { responseHandler } from './utils/responses/base'
 
 import { applyMiddlewares } from './utils/middleware'
 import { errorHandlingMiddleware } from './utils/middleware/error'
-
-import { responseHandler } from './utils/responses/base'
-import { logger } from './utils/tools/logger'
+import combineRouters from './routes'
 
 const app = express()
-const PORT = process.env.PORT || 8000
-const MONGODB_URI = process.env.MONGODB_URI || ''
 
 applyMiddlewares(app)
 
@@ -31,16 +29,17 @@ app.get('/', (req: Request, res: Response) => {
     })
 })
 
+combineRouters(app)
+
 app.use(errorHandlingMiddleware)
 
-mongoose
-    .connect(MONGODB_URI)
+makeDBConnections()
     .then(() => {
-        app.listen(PORT, () => {
-            logger.info(`Server Listening in PORT: ${PORT}`)
+        app.listen(config.port, () => {
+            logger.info(`Server Listening on PORT: ${config.port}`)
         })
     })
     .catch((error) => {
-        logger.error(`MongoDB Connection Aborted: ${error}`)
+        logger.error('Error during startup:', error)
         process.exit(1)
     })
