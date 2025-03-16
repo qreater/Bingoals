@@ -13,6 +13,7 @@ export enum ErrorType {
     NOT_FOUND = 'not_found_error',
     VALIDATION = 'validation_error',
     UNAUTHORIZED = 'unauthorized_error',
+    TOO_MANY_REQUESTS = 'too_many_requests_error',
     SERVER_ERROR = 'server_error',
 }
 
@@ -85,6 +86,18 @@ export class APIError extends Error {
             response.errors.message,
             422,
             response.errors.additionalInfo,
+        )
+    }
+
+    static tooManyRequests(): APIError {
+        const response = createErrorResponse(
+            ErrorType.TOO_MANY_REQUESTS,
+            'Too many requests!',
+        )
+        return new APIError(
+            ErrorType.TOO_MANY_REQUESTS,
+            response.errors.message,
+            429,
         )
     }
 

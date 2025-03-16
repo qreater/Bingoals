@@ -18,16 +18,41 @@ import {
 } from '../schema/user'
 import { register, login, verifyOTP, lookup, me } from '../utils/user'
 import { authMiddleware } from '../utils/middleware/auth'
+import { rateLimiterMiddleware } from '../utils/middleware/limiter'
 
 const router = express.Router()
 
-router.post('/register', validate(registerSchema), register)
+router.post(
+    '/register',
+    rateLimiterMiddleware(),
+    validate(registerSchema),
+    register,
+)
 
-router.post('/login', validate(loginSchema), login)
+router.post(
+    '/login',
+    rateLimiterMiddleware({
+        max: 3,
+    }),
+    validate(loginSchema),
+    login,
+)
 
-router.post('/verify-otp', validate(verifyOTPSchema), verifyOTP)
+router.post(
+    '/verify-otp',
+    rateLimiterMiddleware(),
+    validate(verifyOTPSchema),
+    verifyOTP,
+)
 
-router.get('/lookup', validate(lookupSchema), lookup)
+router.get(
+    '/lookup',
+    rateLimiterMiddleware({
+        max: 20,
+    }),
+    validate(lookupSchema),
+    lookup,
+)
 
 router.get('/me', authMiddleware, validate(meSchema), me)
 
