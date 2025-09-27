@@ -55,7 +55,7 @@ Since the server is run in the background, its logs are not directly visible. To
 4.  **View the logs:**
     You can then view the logs in real-time using `tail -f server.log`:
     ```bash
-    tail -f backend/server.log
+    tail -f server.log
     ```
 
 **Important Note:** Committing changes directly to the `main` branch is strictly prohibited.

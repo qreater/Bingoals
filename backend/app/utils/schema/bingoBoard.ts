@@ -45,4 +45,6 @@ const BingoBoardSchema: Schema = new Schema(
     { timestamps: true },
 )
 
+BingoBoardSchema.index({ userId: 1, weekStartDate: 1 }, { unique: true })
+
 export const BingoBoard = model<IBingoBoard>('BingoBoard', BingoBoardSchema)
