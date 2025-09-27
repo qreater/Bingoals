@@ -81,3 +81,55 @@ After making code changes, you can automatically fix most linting and formatting
 cd backend
 npm run lint:fix
 ```
+
+---
+
+# Frontend Setup Notes
+
+This section outlines the setup and conventions for the Bingoals frontend.
+
+**Stack:**
+*   **Framework:** Svelte
+*   **Build Tool:** Vite
+*   **Styling:** Tailwind CSS
+*   **Language:** JavaScript (with JSDoc for type checking)
+
+**Key Files and Directories:**
+*   `frontend/index.html`: The main HTML entry point.
+*   `frontend/src/main.js`: The JavaScript entry point for the Svelte application.
+*   `frontend/src/App.svelte`: The root Svelte component.
+*   `frontend/src/app.css`: Global CSS, including Tailwind directives and font imports.
+*   `frontend/tailwind.config.js`: Tailwind CSS configuration, including custom font settings.
+*   `frontend/postcss.config.js`: PostCSS configuration for Tailwind CSS.
+*   `frontend/src/lib/components/`: Directory for reusable Svelte components.
+
+**Font:**
+The primary font used across the application is **Alegreya Sans** from Google Fonts. It is imported via `@import` in `frontend/src/app.css` and configured as the default `sans` font in `frontend/tailwind.config.js`.
+
+**Local Setup Steps:**
+
+1.  **Navigate to the frontend directory:**
+    ```bash
+    cd frontend
+    ```
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+3.  **Start the development server:**
+    ```bash
+    npm run dev
+    ```
+    This will start the development server, typically accessible at `http://localhost:5173` (or another port if 5173 is in use).
+
+**Design Practices to Minimize Code Bloat:**
+
+To maintain a lean and efficient codebase, we adhere to the following practices:
+
+*   **Component-Based Architecture:** Break down the UI into small, reusable Svelte components. Store these in `frontend/src/lib/components/`.
+*   **Tailwind CSS for Styling:** Leverage Tailwind's utility-first approach to avoid writing custom CSS where possible, promoting consistency and reducing stylesheet size.
+*   **DRY (Don't Repeat Yourself):** Actively identify and refactor duplicated code into reusable functions, stores, or components.
+*   **Minimal Dependencies:** Only introduce new libraries or packages when absolutely necessary and after careful consideration of their impact on bundle size and performance.
+
+*   **Focus on Core Functionality:** Prioritize delivering essential features efficiently, avoiding premature optimization or over-engineering.
+*   **Regular Review and Refactoring:** Periodically review the codebase for opportunities to simplify, optimize, and remove unnecessary code.
